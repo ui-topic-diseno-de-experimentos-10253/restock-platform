@@ -1,0 +1,242 @@
+[
+  {
+    "name": "Papa Amarilla",
+    "description": "Papa amarilla de alta calidad para consumo directo",
+    "perishable": true,
+    "category": "Tubérculos"
+  },
+  {
+    "name": "Papa Blanca",
+    "description": "Papa blanca versátil para frituras y guisos",
+    "perishable": true,
+    "category": "Tubérculos"
+  },
+  {
+    "name": "Camote",
+    "description": "Camote dulce ideal para frituras y acompañamientos",
+    "perishable": true,
+    "category": "Tubérculos"
+  },
+  {
+    "name": "Yuca",
+    "description": "Yuca fresca para frituras y guarniciones",
+    "perishable": true,
+    "category": "Tubérculos"
+  },
+  {
+    "name": "Cebolla Roja",
+    "description": "Cebolla roja fresca para cocina",
+    "perishable": true,
+    "category": "Verduras"
+  },
+  {
+    "name": "Cebolla Blanca",
+    "description": "Cebolla blanca para salteados y bases de cocina",
+    "perishable": true,
+    "category": "Verduras"
+  },
+  {
+    "name": "Ajo",
+    "description": "Ajo fresco esencial para aderezos",
+    "perishable": true,
+    "category": "Verduras"
+  },
+  {
+    "name": "Kion",
+    "description": "Jengibre fresco utilizado en cocina chifa",
+    "perishable": true,
+    "category": "Verduras"
+  },
+  {
+    "name": "Ají Amarillo",
+    "description": "Ají amarillo fresco para salsas y guisos",
+    "perishable": true,
+    "category": "Ajíes"
+  },
+  {
+    "name": "Ají Panca",
+    "description": "Ají panca seco o en pasta para aderezos",
+    "perishable": false,
+    "category": "Ajíes"
+  },
+  {
+    "name": "Ají Limo",
+    "description": "Ají limo fresco para ceviches",
+    "perishable": true,
+    "category": "Ajíes"
+  },
+  {
+    "name": "Culantro",
+    "description": "Hierba aromática fresca para sopas y arroces",
+    "perishable": true,
+    "category": "Hierbas"
+  },
+  {
+    "name": "Perejil",
+    "description": "Hierba fresca para decoración y sabor",
+    "perishable": true,
+    "category": "Hierbas"
+  },
+  {
+    "name": "Pollo Entero",
+    "description": "Pollo fresco sin vísceras",
+    "perishable": true,
+    "category": "Carnes"
+  },
+  {
+    "name": "Pechuga de Pollo",
+    "description": "Corte magro de pollo para plancha y salteados",
+    "perishable": true,
+    "category": "Carnes"
+  },
+  {
+    "name": "Carne de Res",
+    "description": "Carne de res para guisos y saltados",
+    "perishable": true,
+    "category": "Carnes"
+  },
+  {
+    "name": "Lomo Fino",
+    "description": "Corte premium para lomo saltado",
+    "perishable": true,
+    "category": "Carnes"
+  },
+  {
+    "name": "Cerdo",
+    "description": "Carne de cerdo para frituras y guisos",
+    "perishable": true,
+    "category": "Carnes"
+  },
+  {
+    "name": "Pescado Fresco",
+    "description": "Pescado del día para ceviches",
+    "perishable": true,
+    "category": "Pescados"
+  },
+  {
+    "name": "Langostinos",
+    "description": "Mariscos frescos para platos marinos",
+    "perishable": true,
+    "category": "Mariscos"
+  },
+  {
+    "name": "Arroz Extra",
+    "description": "Arroz largo extra para todo tipo de preparación",
+    "perishable": false,
+    "category": "Granos"
+  },
+  {
+    "name": "Fideos",
+    "description": "Pasta seca para sopas y tallarines",
+    "perishable": false,
+    "category": "Granos"
+  },
+  {
+    "name": "Quinua",
+    "description": "Grano andino nutritivo",
+    "perishable": false,
+    "category": "Granos"
+  },
+  {
+    "name": "Aceite Vegetal",
+    "description": "Aceite comestible en botella de 1 litro",
+    "perishable": false,
+    "category": "Abarrotes"
+  },
+  {
+    "name": "Aceite de Oliva",
+    "description": "Aceite premium para ensaladas y acabados",
+    "perishable": false,
+    "category": "Abarrotes"
+  },
+  {
+    "name": "Vinagre",
+    "description": "Vinagre blanco para aderezos",
+    "perishable": false,
+    "category": "Abarrotes"
+  },
+  {
+    "name": "Salsa de Soya",
+    "description": "Salsa base para cocina chifa",
+    "perishable": false,
+    "category": "Abarrotes"
+  },
+  {
+    "name": "Sillao",
+    "description": "Salsa de soya peruana",
+    "perishable": false,
+    "category": "Abarrotes"
+  },
+  {
+    "name": "Sal",
+    "description": "Sal de mesa refinada",
+    "perishable": false,
+    "category": "Condimentos"
+  },
+  {
+    "name": "Pimienta",
+    "description": "Pimienta molida para sazonar",
+    "perishable": false,
+    "category": "Condimentos"
+  },
+  {
+    "name": "Comino",
+    "description": "Especia esencial en aderezos peruanos",
+    "perishable": false,
+    "category": "Condimentos"
+  },
+  {
+    "name": "Orégano",
+    "description": "Hierba seca para sazonar carnes",
+    "perishable": false,
+    "category": "Condimentos"
+  },
+  {
+    "name": "Leche Evaporada",
+    "description": "Leche evaporada en lata de 410 ml",
+    "perishable": false,
+    "category": "Lácteos"
+  },
+  {
+    "name": "Queso Fresco",
+    "description": "Queso blanco para acompañamientos",
+    "perishable": true,
+    "category": "Lácteos"
+  },
+  {
+    "name": "Mantequilla",
+    "description": "Mantequilla para cocina y panadería",
+    "perishable": true,
+    "category": "Lácteos"
+  },
+  {
+    "name": "Harina sin preparar",
+    "description": "Harina de trigo sin aditivos, ideal para panadería",
+    "perishable": false,
+    "category": "Panadería"
+  },
+  {
+    "name": "Pan",
+    "description": "Pan fresco para consumo diario",
+    "perishable": true,
+    "category": "Panadería"
+  },
+  {
+    "name": "Huevo de Gallina",
+    "description": "Huevo fresco categoría A",
+    "perishable": true,
+    "category": "Huevos"
+  },
+  {
+    "name": "Azúcar",
+    "description": "Azúcar blanca para bebidas y postres",
+    "perishable": false,
+    "category": "Abarrotes"
+  },
+  {
+    "name": "Chicha Morada Concentrada",
+    "description": "Base para bebida tradicional peruana",
+    "perishable": false,
+    "category": "Bebidas"
+  }
+]
