@@ -49,8 +49,8 @@ public class OpenApiConfiguration {
                                         .bearerFormat("JWT")));
 
         openApi.servers(List.of(
-                //new Server().url("https://restock-platform-10253.onrender.com")
-                new Server().url("http://localhost:8080")
+                new Server().url("https://restock-platform-10253.onrender.com")
+                //new Server().url("http://localhost:8080")
         ));
 
         return openApi;
