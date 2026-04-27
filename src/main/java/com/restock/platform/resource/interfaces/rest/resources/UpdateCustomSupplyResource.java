@@ -3,8 +3,8 @@ package com.restock.platform.resource.interfaces.rest.resources;
 public record UpdateCustomSupplyResource(
         Long supplyId,
         String description,
-        int minStock,
-        int maxStock,
+        Double minStock,
+        Double maxStock,
         double price,
         String unitName,
         String unitAbbreviaton
@@ -15,9 +15,9 @@ public record UpdateCustomSupplyResource(
             throw new IllegalArgumentException("Supply Id is required");
         if (description == null || description.isBlank())
             throw new IllegalArgumentException("Description is required");
-        if (minStock < 0)
+        if (minStock == null || minStock < 0)
             throw new IllegalArgumentException("Min stock must be non-negative");
-        if (maxStock < minStock)
+        if (maxStock == null || maxStock < minStock)
             throw new IllegalArgumentException("Max stock must be greater than or equal to min stock");
         if (price < 0)
             throw new IllegalArgumentException("Price must be non-negative");

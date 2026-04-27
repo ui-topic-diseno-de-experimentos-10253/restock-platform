@@ -28,6 +28,8 @@ public class Sale extends AuditableAbstractAggregateRoot<Sale> {
     private List<SaleDish> dishSelections = new ArrayList<>();
 
     @Setter
+    private List<SaleSupply> supplySelections = new ArrayList<>();
+
     protected Sale() {
     }
 

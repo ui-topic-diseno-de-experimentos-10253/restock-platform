@@ -20,7 +20,7 @@ public class RestockPlatformApplication {
 
     @Bean
     CommandLineRunner logEffectiveMongoConfiguration(Environment environment) {
-        return _ -> {
+        return args -> {
             var activeProfiles = environment.getActiveProfiles();
             var mongoUri = environment.getProperty("spring.data.mongodb.uri");
             var mongoDb = environment.getProperty("spring.data.mongodb.database");

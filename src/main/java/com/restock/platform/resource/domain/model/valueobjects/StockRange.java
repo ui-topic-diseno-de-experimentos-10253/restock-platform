@@ -1,11 +1,15 @@
 package com.restock.platform.resource.domain.model.valueobjects;
 
 public record StockRange(
-        int minStock,
-        int maxStock
+        Double minStock,
+        Double maxStock
 ) {
 
     public StockRange {
+
+        if (minStock == null || maxStock == null) {
+            throw new IllegalArgumentException("minStock and maxStock cannot be null");
+        }
 
         if (minStock < 0) {
             throw new IllegalArgumentException("minStock cannot be negative");
@@ -16,7 +20,7 @@ public record StockRange(
         }
     }
 
-    public boolean isInRange(int value) {
+    public boolean isInRange(double value) {
         return value >= minStock && value <= maxStock;
     }
 }
