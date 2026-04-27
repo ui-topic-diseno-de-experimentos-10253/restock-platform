@@ -14,7 +14,6 @@ import org.springframework.core.env.Environment;
 public class RestockPlatformApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestockPlatformApplication.class);
-
     public static void main(String[] args) {
         SpringApplication.run(RestockPlatformApplication.class, args);
     }

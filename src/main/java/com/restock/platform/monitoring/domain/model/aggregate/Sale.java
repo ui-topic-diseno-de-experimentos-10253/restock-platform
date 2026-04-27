@@ -24,13 +24,10 @@ public class Sale extends AuditableAbstractAggregateRoot<Sale> {
     private Date registeredDate;
     private Integer userId;
     private SaleStatus status;
-
     @Setter
     private List<SaleDish> dishSelections = new ArrayList<>();
 
     @Setter
-    private List<SaleSupply> supplySelections = new ArrayList<>();
-
     protected Sale() {
     }
 
