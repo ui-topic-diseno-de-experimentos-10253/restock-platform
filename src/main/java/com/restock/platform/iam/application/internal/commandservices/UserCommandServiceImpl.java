@@ -10,6 +10,7 @@ import com.restock.platform.iam.domain.services.UserCommandService;
 import com.restock.platform.iam.infrastructure.persistence.mongodb.repositories.RoleRepository;
 import com.restock.platform.iam.infrastructure.persistence.mongodb.repositories.UserRepository;
 import com.restock.platform.shared.domain.exceptions.InvalidCredentialsException;
+import com.restock.platform.shared.domain.exceptions.UsernameAlreadyExistsException;
 import com.restock.platform.shared.infrastructure.persistence.mongodb.SequenceGeneratorService;
 import com.restock.platform.subscriptions.interfaces.acl.SubscriptionsContextFacade;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -76,7 +77,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     public Optional<User> handle(SignUpCommand command) {
         if (userRepository.existsByUsername(command.username()))
-            throw new RuntimeException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists");
 
         var role = roleRepository.findById(command.roleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));

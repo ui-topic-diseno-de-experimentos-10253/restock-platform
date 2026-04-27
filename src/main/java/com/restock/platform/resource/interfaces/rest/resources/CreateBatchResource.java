@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public record CreateBatchResource(
         Long userId,
         Long customSupplyId,
-        Integer stock,
+        Double stock,
         LocalDate expirationDate
 ) {
     public CreateBatchResource {
@@ -16,7 +16,7 @@ public record CreateBatchResource(
             throw new IllegalArgumentException("User ID must be a positive number");
         if (customSupplyId == null || customSupplyId <= 0)
             throw new IllegalArgumentException("Supply ID must be a positive number");
-        if (stock < 0)
+        if (stock == null || stock < 0)
             throw new IllegalArgumentException("Stock cannot be negative");
         if (expirationDate == null)
             throw new IllegalArgumentException("Expiration date cannot be null");

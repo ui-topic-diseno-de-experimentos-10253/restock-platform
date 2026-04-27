@@ -3,7 +3,9 @@ package com.restock.platform.monitoring.interfaces.rest;
 import com.restock.platform.monitoring.application.internal.commandservices.SaleCommandServiceImpl;
 import com.restock.platform.monitoring.application.internal.queryservices.SaleQueryServiceImpl;
 import com.restock.platform.monitoring.domain.model.commands.DeleteSaleCommand;
+import com.restock.platform.monitoring.domain.model.queries.GetAllSalesQuery;
 import com.restock.platform.monitoring.domain.model.queries.GetAllSalesByUserIdQuery;
+import com.restock.platform.monitoring.domain.model.queries.GetSaleByIdQuery;
 import com.restock.platform.monitoring.domain.model.queries.GetSaleByIdAndUserIdQuery;
 import com.restock.platform.monitoring.interfaces.rest.resources.CreateSaleResource;
 import com.restock.platform.monitoring.interfaces.rest.resources.SaleResource;
@@ -47,11 +49,9 @@ public class SalesController {
     public ResponseEntity<List<SaleResource>> getAllSales() {
         Long userId = authenticationHelper.getCurrentUserId();
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        var sales = saleQueryService.handle(new GetAllSalesByUserIdQuery(userId.intValue()));
+        var sales = (userId != null)
+            ? saleQueryService.handle(new GetAllSalesByUserIdQuery(userId.intValue()))
+            : saleQueryService.handle(new GetAllSalesQuery());
         var resources = sales.stream()
             .map(SaleResourceFromEntityAssembler::toResourceFromEntity)
             .toList();
@@ -68,11 +68,9 @@ public class SalesController {
     public ResponseEntity<SaleResource> getSaleById(@PathVariable Long id) {
         Long userId = authenticationHelper.getCurrentUserId();
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        var saleOptional = saleQueryService.handle(new GetSaleByIdAndUserIdQuery(id, userId.intValue()));
+        var saleOptional = (userId != null)
+            ? saleQueryService.handle(new GetSaleByIdAndUserIdQuery(id, userId.intValue()))
+            : saleQueryService.handle(new GetSaleByIdQuery(id));
 
         if (saleOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -92,36 +90,32 @@ public class SalesController {
     public ResponseEntity<SaleResponseResource> createSale(@RequestBody CreateSaleResource resource) {
         Long userId = authenticationHelper.getCurrentUserId();
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Integer effectiveUserId = (userId != null) ? userId.intValue() : resource.userId();
+        if (effectiveUserId == null || effectiveUserId <= 0) {
+            return ResponseEntity.badRequest().body(new SaleResponseResource(false, null, "userId is required"));
         }
 
-        try {
-            var createSaleCommand = CreateSaleCommandFromResourceAssembler.toCommandFromResourceWithUserId(
-                resource, userId.intValue()
-            );
-            var saleId = saleCommandService.handle(createSaleCommand);
+        var createSaleCommand = CreateSaleCommandFromResourceAssembler.toCommandFromResourceWithUserId(
+            resource, effectiveUserId
+        );
+        var saleId = saleCommandService.handle(createSaleCommand);
 
-            if (saleId == null || saleId == 0L) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            var query = new GetSaleByIdAndUserIdQuery(saleId, userId.intValue());
-            var saleOptional = saleQueryService.handle(query);
-
-            if (saleOptional.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            var saleResource = SaleResourceFromEntityAssembler.toResourceFromEntity(saleOptional.get());
-            var response = new SaleResponseResource(true, saleResource, "Sale registered successfully");
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
+        if (saleId == null || saleId == 0L) {
             return ResponseEntity.badRequest().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+
+        var saleOptional = (userId != null)
+            ? saleQueryService.handle(new GetSaleByIdAndUserIdQuery(saleId, effectiveUserId))
+            : saleQueryService.handle(new GetSaleByIdQuery(saleId));
+
+        if (saleOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var saleResource = SaleResourceFromEntityAssembler.toResourceFromEntity(saleOptional.get());
+        var response = new SaleResponseResource(true, saleResource, "Sale registered successfully");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
@@ -135,12 +129,11 @@ public class SalesController {
     public ResponseEntity<Void> deleteSale(@PathVariable Long id) {
         Long userId = authenticationHelper.getCurrentUserId();
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         try {
-            var saleOptional = saleQueryService.handle(new GetSaleByIdAndUserIdQuery(id, userId.intValue()));
+            // Sin autenticación, permitimos borrar si existe (ojo: en prod normalmente NO harías esto).
+            var saleOptional = (userId != null)
+                ? saleQueryService.handle(new GetSaleByIdAndUserIdQuery(id, userId.intValue()))
+                : saleQueryService.handle(new GetSaleByIdQuery(id));
 
             if (saleOptional.isEmpty()) {
                 return ResponseEntity.notFound().build();

@@ -7,6 +7,7 @@ import com.restock.platform.monitoring.domain.model.valueobjects.SaleNumber;
 import com.restock.platform.monitoring.domain.model.valueobjects.SaleStatus;
 import com.restock.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -23,8 +24,11 @@ public class Sale extends AuditableAbstractAggregateRoot<Sale> {
     private Date registeredDate;
     private Integer userId;
     private SaleStatus status;
-    private final List<SaleDish> dishSelections = new ArrayList<>();
-    private final List<SaleSupply> supplySelections = new ArrayList<>();
+    @Setter
+    private List<SaleDish> dishSelections = new ArrayList<>();
+
+    @Setter
+    private List<SaleSupply> supplySelections = new ArrayList<>();
 
     protected Sale() {
     }
