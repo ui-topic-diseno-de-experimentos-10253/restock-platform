@@ -26,9 +26,9 @@ class AlertTest {
     void shouldUpdateStatusCorrectly() {
         Alert alert = new Alert("Pending order", 1L, OrderToSupplierSituation.PENDING, 100L, 200L);
         
-        alert.updateStatus(OrderToSupplierState.SHIPPED, OrderToSupplierSituation.APPROVED);
+        alert.updateStatus(OrderToSupplierState.ON_THE_WAY, OrderToSupplierSituation.APPROVED);
         
-        assertEquals(OrderToSupplierState.SHIPPED, alert.getStateAtAlert());
+        assertEquals(OrderToSupplierState.ON_THE_WAY, alert.getStateAtAlert());
         assertEquals(OrderToSupplierSituation.APPROVED, alert.getSituationAtAlert());
     }
 

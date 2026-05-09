@@ -51,9 +51,9 @@ class OrderTest {
     void shouldUpdateStateAndSituation() {
         Order order = new Order(validCommand);
 
-        order.update(OrderToSupplierState.SHIPPED, OrderToSupplierSituation.APPROVED);
+        order.update(OrderToSupplierState.ON_THE_WAY, OrderToSupplierSituation.APPROVED);
 
-        assertEquals(OrderToSupplierState.SHIPPED, order.getState());
+        assertEquals(OrderToSupplierState.ON_THE_WAY, order.getState());
         assertEquals(OrderToSupplierSituation.APPROVED, order.getSituation());
     }
 
