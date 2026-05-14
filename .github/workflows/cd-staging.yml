@@ -8,6 +8,7 @@ on:
 jobs:
   deploy-to-staging:
     runs-on: ubuntu-latest
+    environment: Staging
 
     steps:
       - name: 1. Checkout del codigo
@@ -31,12 +32,6 @@ jobs:
           if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
             echo "Secreto RENDER_DEPLOY_HOOK_URL no encontrado. Simulando despliegue de Staging..."
           else
-            echo "Disparando el webhook de Render para despliegue real.."
+            echo "Disparando el webhook de Render para despliegue real..."
             curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
           fi
-
-      - name: 6. Simulación de Entrega a Firebase App Distribution
-        run: echo "Enviando APK a Testers via Firebase..."
-
-      - name: 7. Esperando Aprobacion Manual (Manual Gate)
-        run: echo "Entorno de Staging actualizado. Esperando validacion del equipo QA para promover a Produccion."
