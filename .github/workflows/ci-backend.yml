@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-22.04
+    runs-on: windows-latest  # <--- EL TRUCO: Si funciona en Windows local, que GitHub use Windows
 
     steps:
       - name: 1. Checkout del codigo
