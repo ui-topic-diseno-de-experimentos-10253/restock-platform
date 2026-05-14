@@ -1,0 +1,33 @@
+name: Staging Continuous Delivery
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy-to-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: 2. Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 3. Construir Artefacto (Release Candidate)
+        run: mvn clean package -DskipTests
+
+      - name: 4. Simulacion de Despliegue a Render (Staging Environment)
+        run: echo "Desplegando la imagen Docker en la instancia de Staging en Render..."
+
+      - name: 5. Simulacion de Entrega a Firebase App Distribution
+        run: echo "Enviando APK a Testers via Firebase..."
+
+      - name: 6. Esperando Aprobacion Manual (Manual Gate)
+        run: echo "Entorno de Staging actualizado. Esperando validacion del equipo QA para promover a Produccion."
