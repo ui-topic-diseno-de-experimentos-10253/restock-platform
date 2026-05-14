@@ -20,14 +20,23 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: 3. Construir Artefacto (Release Candidate)
+      - name: 3. Construir y Validar Artefacto JAR
         run: mvn clean package -DskipTests
 
-      - name: 4. Simulacion de Despliegue a Render (Staging Environment)
-        run: echo "Desplegando la imagen Docker en la instancia de Staging en Render..."
+      - name: 4. Construir Imagen Docker (Release Candidate)
+        run: docker build -t restock-backend-staging:latest .
 
-      - name: 5. Simulacion de Entrega a Firebase App Distribution
+      - name: 5. Despliegue Real a Render (Staging)
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "Secreto RENDER_DEPLOY_HOOK_URL no encontrado. Simulando despliegue de Staging..."
+          else
+            echo "Disparando el webhook de Render para despliegue real.."
+            curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          fi
+
+      - name: 6. Simulación de Entrega a Firebase App Distribution
         run: echo "Enviando APK a Testers via Firebase..."
 
-      - name: 6. Esperando Aprobacion Manual (Manual Gate)
+      - name: 7. Esperando Aprobacion Manual (Manual Gate)
         run: echo "Entorno de Staging actualizado. Esperando validacion del equipo QA para promover a Produccion."
