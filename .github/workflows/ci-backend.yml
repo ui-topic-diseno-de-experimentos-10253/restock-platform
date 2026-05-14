@@ -11,21 +11,34 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: windows-latest  # <--- EL TRUCO: Si funciona en Windows local, que GitHub use Windows
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: 1. Checkout del codigo
         uses: actions/checkout@v4
 
-      - name: 2. Setup JDK 24
+      - name: 2. Setup JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '24'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
       - name: 3. Ejecutar Pruebas
         run: mvn test
+        env:
+          SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/testdb
 
       - name: 4. Empaquetar
         run: mvn clean package -DskipTests
