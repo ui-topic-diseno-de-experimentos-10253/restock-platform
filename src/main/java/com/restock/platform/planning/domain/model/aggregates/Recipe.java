@@ -43,7 +43,7 @@ public class Recipe extends AuditableAbstractAggregateRoot<Recipe> {
                 .findFirst();
 
         if (existing.isPresent()) {
-            throw new IllegalArgumentException("Supply already exists in recipe");
+            throw new IllegalArgumentException("Supply dalready exists in recipe");
         }
 
         var supply = new RecipeSupply(recipeId, supplyId, quantity);
