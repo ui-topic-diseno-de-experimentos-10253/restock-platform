@@ -23,6 +23,13 @@ jobs:
           curl --fail --show-error --silent --location --max-time 20 "${{ secrets.FRONTEND_URL }}" > /dev/null
           echo "Frontend availability check completed successfully."
 
+      - name: Register technical alert
+        if: failure()
+        run: |
+          echo "## Technical Alert" >> $GITHUB_STEP_SUMMARY
+          echo "A monitored service is not available." >> $GITHUB_STEP_SUMMARY
+          echo "Review backend health endpoint, frontend URL, Render logs and latest deployment." >> $GITHUB_STEP_SUMMARY
+
       - name: Register monitoring summary
         if: always()
         run: |
