@@ -1,0 +1,32 @@
+name: Continuous Monitoring
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"
+
+jobs:
+  availability-check:
+    name: Availability Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check backend health endpoint
+        run: |
+          echo "Checking backend health endpoint..."
+          curl --fail --show-error --silent --location --max-time 20 "${{ secrets.BACKEND_HEALTH_URL }}"
+          echo "Backend health check completed successfully."
+
+      - name: Check frontend availability
+        run: |
+          echo "Checking frontend availability..."
+          curl --fail --show-error --silent --location --max-time 20 "${{ secrets.FRONTEND_URL }}" > /dev/null
+          echo "Frontend availability check completed successfully."
+
+      - name: Register monitoring summary
+        if: always()
+        run: |
+          echo "## Continuous Monitoring Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend health URL: ${{ secrets.BACKEND_HEALTH_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend URL: ${{ secrets.FRONTEND_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Workflow status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
