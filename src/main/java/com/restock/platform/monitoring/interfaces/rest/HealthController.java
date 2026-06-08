@@ -1,4 +1,4 @@
-package com.restock.platform.monitoring.interfaces.rest.controllers;
+package com.restock.platform.monitoring.interfaces.rest;
 
 import org.bson.Document;
 import org.springframework.core.env.Environment;
