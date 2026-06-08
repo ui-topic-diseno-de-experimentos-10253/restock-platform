@@ -1,0 +1,37 @@
+name: Staging Continuous Delivery
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy-to-staging:
+    runs-on: ubuntu-latest
+    environment: Staging
+
+    steps:
+      - name: 1. Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: 2. Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 3. Construir y Validar Artefacto JAR
+        run: mvn clean package -DskipTests
+
+      - name: 4. Construir Imagen Docker (Release Candidate)
+        run: docker build -t restock-backend-staging:latest .
+
+      - name: 5. Despliegue Real a Render (Staging)
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "Secreto RENDER_DEPLOY_HOOK_URL no encontrado. Simulando despliegue de Staging..."
+          else
+            echo "Disparando el webhook de Render para despliegue real..."
+            curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          fi
