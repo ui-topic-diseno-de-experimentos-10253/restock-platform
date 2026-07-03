@@ -5,9 +5,12 @@ import com.restock.platform.iam.domain.model.queries.GetUserByIdQuery;
 import com.restock.platform.iam.domain.services.UserCommandService;
 import com.restock.platform.iam.domain.services.UserQueryService;
 import com.restock.platform.iam.interfaces.rest.resources.UpdateSubscriptionResource;
+import com.restock.platform.iam.interfaces.rest.resources.UserActivationStateResource;
 import com.restock.platform.iam.interfaces.rest.resources.UserResource;
 import com.restock.platform.iam.interfaces.rest.transform.UpdateUserSubscriptionCommandFromResourceAssembler;
 import com.restock.platform.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
+import com.restock.platform.resource.domain.model.queries.GetOrdersByAdminRestaurantIdQuery;
+import com.restock.platform.resource.domain.services.OrderQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,10 +33,14 @@ import java.util.List;
 public class UsersController {
     private final UserQueryService userQueryService;
     private final UserCommandService userCommandService;
+    private final OrderQueryService orderQueryService;
 
-    public UsersController(UserQueryService userQueryService, UserCommandService userCommandService) {
+    public UsersController(UserQueryService userQueryService,
+                           UserCommandService userCommandService,
+                           OrderQueryService orderQueryService) {
         this.userQueryService = userQueryService;
         this.userCommandService = userCommandService;
+        this.orderQueryService = orderQueryService;
     }
 
     /**
@@ -100,5 +107,19 @@ public class UsersController {
         }
         var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(user.get());
         return ResponseEntity.ok(userResource);
+    }
+
+    @GetMapping(value = "/{userId}/activation-state")
+    @Operation(summary = "Get user activation state", description = "Retrieve backend activation signals so the mobile app can decide whether to show onboarding.")
+    public ResponseEntity<UserActivationStateResource> getUserActivationState(@PathVariable Long userId) {
+        var user = userQueryService.handle(new GetUserByIdQuery(userId));
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
+
+        var createdOrdersCount = orderQueryService.handle(new GetOrdersByAdminRestaurantIdQuery(userId)).size();
+        return ResponseEntity.ok(new UserActivationStateResource(
+                userId,
+                createdOrdersCount > 0,
+                createdOrdersCount
+        ));
     }
 }

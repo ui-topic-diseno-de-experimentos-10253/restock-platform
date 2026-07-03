@@ -2,6 +2,8 @@ package com.restock.platform.resource.interfaces.rest;
 
 import com.restock.platform.resource.domain.model.commands.DeleteCustomSupplyCommand;
 import com.restock.platform.resource.domain.model.queries.*;
+import com.restock.platform.resource.interfaces.rest.resources.AssistedCatalogUploadResource;
+import com.restock.platform.resource.interfaces.rest.resources.AssistedCatalogUploadResponseResource;
 import com.restock.platform.resource.domain.services.CustomSupplyCommandService;
 import com.restock.platform.resource.domain.services.CustomSupplyQueryService;
 import com.restock.platform.resource.interfaces.rest.resources.CreateCustomSupplyResource;
@@ -46,6 +48,30 @@ public class CustomSupplyController {
 
         var resourceResponse = CustomSupplyResourceFromEntityAssembler.toResourceFromEntity(result.get());
         return new ResponseEntity<>(resourceResponse, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/assisted-catalog-upload")
+    @Operation(summary = "Upload supplier catalog assisted by Restock team")
+    public ResponseEntity<AssistedCatalogUploadResponseResource> uploadAssistedCatalog(
+            @RequestBody AssistedCatalogUploadResource resource) {
+        var createdIds = resource.items().stream()
+                .map(item -> {
+                    if (!resource.supplierId().equals(item.userId())) {
+                        throw new IllegalArgumentException("All catalog items must belong to the supplier");
+                    }
+                    return customSupplyCommandService.handle(
+                            CreateCustomSupplyCommandFromResourceAssembler.toCommandFromResource(item));
+                })
+                .toList();
+
+        var response = new AssistedCatalogUploadResponseResource(
+                resource.supplierId(),
+                resource.assistedBy(),
+                resource.demoSessionCode(),
+                createdIds.size(),
+                createdIds
+        );
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
