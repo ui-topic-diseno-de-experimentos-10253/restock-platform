@@ -12,6 +12,10 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      NOTIFICATIONS_PUSH_ENABLED: false
+      FIREBASE_PROJECT_ID: restock-10253
+      FIREBASE_SERVICE_ACCOUNT_BASE64: test-disabled
 
     steps:
       - name: 1. Checkout del codigo

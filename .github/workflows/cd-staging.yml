@@ -9,6 +9,10 @@ jobs:
   deploy-to-staging:
     runs-on: ubuntu-latest
     environment: Staging
+    env:
+      NOTIFICATIONS_PUSH_ENABLED: true
+      FIREBASE_PROJECT_ID: restock-10253
+      FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
 
     steps:
       - name: 1. Checkout del codigo
@@ -24,10 +28,17 @@ jobs:
       - name: 3. Construir y Validar Artefacto JAR
         run: mvn clean package -DskipTests
 
-      - name: 4. Construir Imagen Docker (Release Candidate)
+      - name: 4. Validar secretos Firebase
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT_BASE64" ]; then
+            echo "FIREBASE_SERVICE_ACCOUNT_BASE64 no esta configurado como GitHub Secret."
+            exit 1
+          fi
+
+      - name: 5. Construir Imagen Docker (Release Candidate)
         run: docker build -t restock-backend-staging:latest .
 
-      - name: 5. Despliegue Real a Render (Staging)
+      - name: 6. Despliegue Real a Render (Staging)
         run: |
           if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
             echo "Secreto RENDER_DEPLOY_HOOK_URL no encontrado. Simulando despliegue de Staging..."
