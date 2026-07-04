@@ -2,12 +2,14 @@ package com.restock.platform.resource.interfaces.rest;
 
 import com.restock.platform.monitoring.domain.model.queries.GetAllSalesByUserIdQuery;
 import com.restock.platform.monitoring.domain.services.SaleQueryService;
-import com.restock.platform.resource.domain.model.aggregates.Batch;
 import com.restock.platform.resource.domain.model.aggregates.CustomSupply;
+import com.restock.platform.resource.application.internal.commandservices.InventoryPushNotificationDispatchService;
+import com.restock.platform.resource.application.internal.queryservices.InventoryPushNotificationCandidateService;
 import com.restock.platform.resource.domain.model.queries.GetBatchesByUserIdQuery;
 import com.restock.platform.resource.domain.model.queries.GetCustomSuppliesByUserIdQuery;
 import com.restock.platform.resource.domain.services.BatchQueryService;
 import com.restock.platform.resource.domain.services.CustomSupplyQueryService;
+import com.restock.platform.resource.interfaces.rest.resources.InventoryPushDispatchResource;
 import com.restock.platform.resource.interfaces.rest.resources.InventoryPushNotificationResource;
 import com.restock.platform.resource.interfaces.rest.resources.InventoryRotationResource;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,10 +17,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,25 +34,31 @@ public class InventoryInsightsController {
     private final BatchQueryService batchQueryService;
     private final CustomSupplyQueryService customSupplyQueryService;
     private final SaleQueryService saleQueryService;
+    private final InventoryPushNotificationCandidateService candidateService;
+    private final InventoryPushNotificationDispatchService dispatchService;
 
     public InventoryInsightsController(BatchQueryService batchQueryService,
                                        CustomSupplyQueryService customSupplyQueryService,
-                                       SaleQueryService saleQueryService) {
+                                       SaleQueryService saleQueryService,
+                                       InventoryPushNotificationCandidateService candidateService,
+                                       InventoryPushNotificationDispatchService dispatchService) {
         this.batchQueryService = batchQueryService;
         this.customSupplyQueryService = customSupplyQueryService;
         this.saleQueryService = saleQueryService;
+        this.candidateService = candidateService;
+        this.dispatchService = dispatchService;
     }
 
     @GetMapping("/users/{userId}/push-notifications-candidates")
-    @Operation(summary = "Get automatic inventory push notification candidates")
+    @Operation(summary = "Get inventory push notification candidates", description = "Detects low stock and supplies expiring in the next 5 days without sending push notifications.")
     public ResponseEntity<List<InventoryPushNotificationResource>> getPushNotifications(@PathVariable Long userId) {
-        var today = LocalDate.now();
-        var limit = today.plusDays(5);
-        var notifications = batchQueryService.handle(new GetBatchesByUserIdQuery(userId)).stream()
-                .flatMap(batch -> buildNotifications(batch, today, limit).stream())
-                .toList();
+        return ResponseEntity.ok(candidateService.findCandidatesByUserId(userId));
+    }
 
-        return ResponseEntity.ok(notifications);
+    @PostMapping("/users/{userId}/push-notifications/dispatch")
+    @Operation(summary = "Dispatch inventory push notifications", description = "Reuses candidate detection, sends Firebase push notifications to active FCM tokens, and stores SENT/FAILED logs.")
+    public ResponseEntity<InventoryPushDispatchResource> dispatchPushNotifications(@PathVariable Long userId) {
+        return ResponseEntity.ok(dispatchService.dispatch(userId));
     }
 
     @GetMapping("/users/{userId}/rotation")
@@ -81,50 +89,6 @@ public class InventoryInsightsController {
                 .toList();
 
         return ResponseEntity.ok(resources);
-    }
-
-    private List<InventoryPushNotificationResource> buildNotifications(Batch batch, LocalDate today, LocalDate limit) {
-        var customSupply = batch.getCustomSupply();
-        if (customSupply == null || customSupply.getStockRange() == null) return List.of();
-
-        var notifications = new java.util.ArrayList<InventoryPushNotificationResource>();
-        var stock = batch.getStock() == null ? 0.0 : batch.getStock();
-        var minStock = customSupply.getStockRange().minStock();
-        var supplyName = resolveSupplyName(customSupply);
-
-        if (stock <= minStock) {
-            notifications.add(new InventoryPushNotificationResource(
-                    batch.getUserId(),
-                    batch.getCustomSupplyId(),
-                    batch.getId(),
-                    supplyName,
-                    "MIN_STOCK",
-                    "Stock minimo alcanzado",
-                    supplyName + " alcanzo su stock minimo.",
-                    stock,
-                    minStock,
-                    batch.getExpirationDate()
-            ));
-        }
-
-        if (batch.getExpirationDate() != null
-                && !batch.getExpirationDate().isBefore(today)
-                && !batch.getExpirationDate().isAfter(limit)) {
-            notifications.add(new InventoryPushNotificationResource(
-                    batch.getUserId(),
-                    batch.getCustomSupplyId(),
-                    batch.getId(),
-                    supplyName,
-                    "EXPIRATION_SOON",
-                    "Insumo por vencer",
-                    supplyName + " vence en los proximos 5 dias.",
-                    stock,
-                    minStock,
-                    batch.getExpirationDate()
-            ));
-        }
-
-        return notifications;
     }
 
     private String resolveSupplyName(CustomSupply customSupply) {
